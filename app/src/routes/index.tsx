@@ -1,13 +1,17 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
 
 export const Route = createFileRoute('/')({
-  component: App,
+  component: IndexRedirect,
 })
 
-function App() {
-  return (
-    <div className="text-center">
-      <h1 className="text-3xl font-bold underline">Login</h1>
-    </div>
-  )
+
+function IndexRedirect() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate({ to: '/login' });
+  }, [navigate]);
+  return null;
 }
+
+export default IndexRedirect;
