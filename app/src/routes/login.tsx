@@ -1,17 +1,25 @@
 import { useState } from 'react'
 import bcrypt from 'bcryptjs'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { supabase } from '../lib/supabaseClient'
+import { useAuth } from '../contexts/AuthContext'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export const Route = createFileRoute('/login')({
+  beforeLoad: () => {
+    const storedUser = localStorage.getItem('soundguard_user')
+    if (storedUser) {
+      throw redirect({ to: '/dashboard' })
+    }
+  },
   component: LoginPage,
 })
 
 function LoginPage() {
   const navigate = useNavigate()
+  const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -24,12 +32,12 @@ function LoginPage() {
 
     const { data: users, error } = await supabase
       .from('users')
-      .select('*')
+      .select('id, name, email, password, role')
       .eq('email', email)
       .limit(1)
       .single()
 
-    if (error || !users) {
+    if (error || !users.id) {
       setErrorMsg('Invalid email or password')
       setLoading(false)
       return
@@ -42,6 +50,13 @@ function LoginPage() {
       setLoading(false)
       return
     }
+
+    login({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+    })
 
     navigate({ to: '/dashboard' })
   }

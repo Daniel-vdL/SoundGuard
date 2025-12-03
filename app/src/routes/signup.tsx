@@ -1,11 +1,17 @@
 import { useState } from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { supabase } from '../lib/supabaseClient'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export const Route = createFileRoute('/signup')({
+  beforeLoad: () => {
+    const storedUser = localStorage.getItem('soundguard_user')
+    if (storedUser) {
+      throw redirect({ to: '/dashboard' })
+    }
+  },
   component: SignupPage,
 })
 function SignupPage() {

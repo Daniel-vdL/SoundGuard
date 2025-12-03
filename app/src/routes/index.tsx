@@ -1,17 +1,13 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({
-  component: IndexRedirect,
+  beforeLoad: () => {
+    const storedUser = localStorage.getItem('soundguard_user')
+    
+    if (storedUser) {
+      throw redirect({ to: '/dashboard' })
+    } else {
+      throw redirect({ to: '/login' })
+    }
+  },
 })
-
-
-function IndexRedirect() {
-  const navigate = useNavigate();
-  useEffect(() => {
-    navigate({ to: '/login' });
-  }, [navigate]);
-  return null;
-}
-
-export default IndexRedirect;
